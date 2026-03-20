@@ -1,0 +1,404 @@
+
+/*Declaración de colores específicos para la página*/
+:root {
+  --tennis-green: #10b981;
+  --tennis-green-dark: #059669;
+  --tennis-blue: #2563eb;
+  --tennis-yellow: #f59e0b;
+  --surface-bg: #f4f7fb;
+  --card-radius: 1.5rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /* Se dan los colores como var() para que el efecto de cambio de tema funcione*/
+  background: var(--bs-body-bg); 
+  color: var(--bs-body-color);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.section-space {
+  padding-top: 3.5rem;
+}
+
+.section-bottom-space {
+  padding-bottom: 4rem;
+}
+
+
+/*Estilado de la barra de navegación degradada*/
+.site-header .navbar {
+  background: linear-gradient(90deg, #0ea84a, #0d973f);
+}
+
+.brand-title,
+.nav-link {
+  color: white;
+}
+
+.nav-link:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+}
+
+.navbar-toggler {
+  border-color: white;
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+/* Boton de cambio de tema de claro a oscuro*/
+.btn-tema-toggle {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  border-radius: 999px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-tema-toggle:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+/* Estilo para el recuadro principal con imagen degradada*/
+.recuadro-card {
+  min-height: 520px;
+  background: #0b1324;
+}
+
+.recuadro-image {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+  display: block;
+}
+
+.recuadro-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.65) 0%, rgba(0, 0, 0, 0.35) 38%, rgba(0, 0, 0, 0.12) 100%);
+}
+
+.recuadro-content {
+  z-index: 2;
+  max-width: 760px;
+  color: #fff;
+}
+
+.recuadro-badge {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 0.65rem 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.recuadro-text {
+  max-width: 650px;
+}
+
+/* Banner de partidos en vivo con el punto de "en vivo"*/
+.live-banner {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.08), rgba(244, 63, 94, 0.05));
+  border: 1px solid rgba(220, 38, 38, 0.14);
+}
+
+.live-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #dc2626;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.12);
+}
+
+.live-subtext {
+  color: var(--bs-secondary-color);
+}
+
+/* Tarjetas mini que aparecen en el banner de live*/
+.mini-tarjeta {
+  min-width: 120px;
+  background: var(--bs-tertiary-bg);
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--bs-border-color);
+}
+
+.mini-tarjeta strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-top: 0.2rem;
+}
+
+.mini-tarjeta-label {
+  font-size: 0.8rem;
+  color: var(--bs-secondary-color);
+}
+
+/* Los títulos referentes a la división de secciones #href*/
+.seccion-titulos {
+  display: inline-block;
+  color: var(--tennis-green-dark);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.82rem;
+  margin-bottom: 0.35rem;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.section-subtitle {
+  color: var(--bs-secondary-color);
+}
+
+/* Las tarjetas de los jugadore tpo 3*/
+.player-card {
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Que pasa si el mouse está encima*/
+.player-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 1.25rem 2rem rgba(0, 0, 0, 0.08) !important;
+}
+
+/* top de las tarjetas con posible foto de jugadores*/
+.player-card-top {
+  height: 100px;
+  background:
+    linear-gradient(rgba(41, 164, 240, 0.82), rgba(4, 93, 149, 0.82)),
+    url("../img/cancha_tenis.avif") center/cover;
+}
+
+.ranking-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(41, 164, 240, 0.486);
+  color: var(--tennis-blue);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+/*Estilado de la tabla de rankings*/
+.player-meta li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.player-meta li:last-child {
+  border-bottom: none;
+}
+
+.player-meta span {
+  color: var(--bs-secondary-color);
+}
+
+.ranking-table thead th {
+  background: var(--bs-tertiary-bg);
+  color: var(--bs-body-color);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ranking-table td,
+.ranking-table th {
+  padding: 1rem 1.1rem;
+  border-color: var(--bs-border-color);
+}
+
+
+
+
+/* Seccion del calendario de los partidos en forma de lista card*/
+.match-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.match-card:hover {
+  transform: translateY(-3px);
+}
+
+.match-tournament {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--tennis-green-dark);
+}
+
+.vs-badge {
+  background: var(--bs-tertiary-bg);
+  color: var(--bs-secondary-color);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.75rem;
+  width: fit-content;
+}
+
+.match-time {
+  font-weight: 600;
+}
+
+.match-status {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.match-status.live {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+}
+
+.match-status.next {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+}
+
+
+/*Tarjetas de estadísticas con sus respectivos colores degradados*/
+.stats-summary-card {
+  border-radius: var(--card-radius);
+  color: #fff;
+  padding: 1.5rem;
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.08);
+}
+
+.summary-green {
+  background: linear-gradient(135deg, #16a34a, #10b981);
+}
+
+.summary-blue {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.summary-yellow {
+  background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 0.35rem;
+}
+
+.summary-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Mini cuadrados de los grand slams de los principales jugadores*/
+.slam-box {
+  background: var(--bs-tertiary-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1rem;
+  padding: 1rem;
+  text-align: center;
+  height: 100%;
+}
+
+.slam-box strong {
+  display: block;
+  font-size: 1.5rem;
+  margin-top: 0.35rem;
+}
+
+.slam-label {
+  color: var(--bs-secondary-color);
+  font-size: 0.9rem;
+}
+
+
+/* Estilado del pie de pagina*/
+.site-footer {
+  border-top: 1px solid var(--bs-border-color);
+  background: var(--bs-tertiary-bg);
+}
+
+/*IMPORTANTE*/
+/* Ajustes para el tema oscuro */
+[data-bs-theme="dark"] .site-header .navbar {
+  background: linear-gradient(90deg, #0c7c36, #0b6f31);
+}
+
+[data-bs-theme="dark"] .recuadro-overlay {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.76) 0%, rgba(0, 0, 0, 0.48) 38%, rgba(0, 0, 0, 0.16) 100%);
+}
+
+[data-bs-theme="dark"] .live-banner {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .ranking-table tbody tr:hover {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+/* IMPORTANTE*/
+/* Cómo se hace responsivo*/
+@media (max-width: 991.98px) {
+  .recuadro-card,
+  .recuadro-image {
+    min-height: 450px;
+    height: 450px;
+  }
+
+  .recuadro-content h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .section-space {
+    padding-top: 2.5rem;
+  }
+
+  .recuadro-card,
+  .recuadro-image {
+    min-height: 420px;
+    height: 420px;
+  }
+
+  .recuadro-content {
+    max-width: 100%;
+  }
+
+  .recuadro-content h1 {
+    font-size: 2rem;
+  }
+
+  .recuadro-text {
+    font-size: 1rem;
+  }
+
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+}

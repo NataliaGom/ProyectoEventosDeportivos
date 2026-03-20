@@ -1,0 +1,607 @@
+<!doctype html>
+<html
+	lang="es"
+	data-bs-theme="light">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0" />
+		<title>Eventos Tenis</title>
+
+		<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet" />
+
+        <!-- Iconos de bootstrap para navbar -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+		<link
+			rel="stylesheet"
+			href="css/styles.css" />
+	</head>
+	<body>
+		<header class="site-header sticky-top">
+			<nav class="navbar navbar-expand-lg border-bottom shadow-sm">
+				<div class="container py-2">
+					<a
+						class="navbar-brand d-flex align-items-center gap-2 fw-bold brand-title"
+						href="#inicio">
+						<i class="bi bi-trophy fs-3"></i>
+						<span>NOMBRE "no definido todavía"</span>
+					</a>
+
+					<div class="d-flex align-items-center gap-2 order-lg-2">
+						<button
+							id="temaToggle"
+							class="btn btn-tema-toggle"
+							type="button"
+							aria-label="Cambiar tema">
+							<i class="bi bi-moon-stars-fill"></i>
+						</button>
+
+						<button
+							class="navbar-toggler"
+							type="button"
+							data-bs-toggle="collapse"
+							data-bs-target="#mainNavbar"
+							aria-controls="mainNavbar"
+							aria-expanded="false"
+							aria-label="Toggle navigation">
+							<span class="navbar-toggler-icon"></span>
+						</button>
+					</div>
+
+					<div
+						class="collapse navbar-collapse order-lg-1"
+						id="mainNavbar">
+						<ul class="navbar-nav ms-lg-4 mt-3 mt-lg-0 gap-lg-2">
+							<li class="nav-item">
+								<a
+									class="nav-link active"
+									href="#inicio">
+									<i class="bi bi-house-door me-1"></i>Inicio
+								</a>
+							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link"
+									href="#jugadores">
+									<i class="bi bi-person-badge me-1"></i>Jugadores
+								</a>
+							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link"
+									href="#partidos">
+									<i class="bi bi-calendar-event me-1"></i>Partidos
+								</a>
+							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link"
+									href="#estadisticas">
+									<i class="bi bi-bar-chart me-1"></i>Estadísticas
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+		</header>
+
+		<main>
+			<section
+				id="inicio"
+				class="section-space">
+				<div class="container">
+					<div
+						class="recuadro-card overflow-hidden position-relative rounded-5 shadow-lg">
+						<img
+							src="img/cancha_tenis.avif"
+							alt="Cancha de tenis"
+							class="recuadro-image" />
+						<div class="recuadro-overlay"></div>
+
+						<div
+							class="recuadro-content position-absolute top-50 start-0 translate-middle-y">
+							<div class="px-4 px-md-5">
+								<span class="badge rounded-pill recuadro-badge mb-3">
+									ATP · Temporada 2026
+								</span>
+								<h1 class="display-4 fw-bold mb-3">
+									Bienvenido a "nombreeee"
+								</h1>
+								<p class="lead mb-4 recuadro-text">
+									Sigue torneos, jugadores, partidos y estadísticas del circuito
+									profesional.
+								</p>
+								<div class="d-flex flex-wrap gap-3">
+									<a
+										href="#partidos"
+										class="btn btn-success btn-lg px-4">
+										Ver partidos
+									</a>
+									<a
+										href="#jugadores"
+										class="btn btn-outline-light btn-lg px-4">
+										Explorar ranking
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- En vivo -->
+					<div class="live-banner mt-4 rounded-4 p-4 shadow-sm">
+						<div
+							class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+							<div>
+								<div class="d-flex align-items-center gap-2 mb-2">
+									<span class="live-dot"></span>
+									<h2 class="h4 mb-0 text-uppercase fw-bold">En vivo ahora</h2>
+								</div>
+								<p class="mb-1 fw-semibold">partdio api</p>
+								<p class="mb-0 live-subtext">jugadores - api</p>
+							</div>
+
+							<div class="d-flex gap-3 flex-wrap">
+								<div class="mini-tarjeta">
+									<span class="mini-tarjeta-label">Jugadores</span>
+									<strong>api</strong>
+								</div>
+								<div class="mini-tarjeta">
+									<span class="mini-tarjeta-label">Torneos</span>
+									<strong>api</strong>
+								</div>
+								<div class="mini-tarjeta">
+									<span class="mini-tarjeta-label">Actualizado</span>
+									<strong>Hoy</strong>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- JUGADORES -->
+    <section id="jugadores" class="section-space">
+      <div class="container">
+        <div class="section-heading d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+          <div>
+            <span class="seccion-titulos">Jugadores</span>
+            <h2 class="section-title mb-1">Top 3 del ranking ATP</h2>
+            <p class="section-subtitle mb-0">Vista destacada de los jugadores más consistentes del circuito.</p>
+          </div>
+          <a href="#estadisticas" class="btn btn-outline-success">Ver estadísticas</a>
+        </div>
+
+        <div id="infoJugadores3" class="row g-4">
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="player-card card border-0 shadow-sm h-100">
+              <div class="player-card-top"></div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h3 id="jugador1-nombre" class="h5 mb-1">..</h3>
+                    <p id="jugador1-pais"class="text-secondary mb-0">..</p>
+                  </div>
+                  <span class="ranking-badge">#1</span>
+                </div>
+
+                <ul class="list-unstyled player-meta mb-0">
+                  <li><span>Fecha de nacimiento:</span><strong id="jugador1-edad">..</strong></li>
+                  <li><span>Títulos</span><strong>24 GS</strong></li>
+                  <li><span>Superficie fuerte</span><strong>Hard</strong></li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="player-card card border-0 shadow-sm h-100">
+              <div class="player-card-top"></div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h3 id="jugador2-nombre" class="h5 mb-1">..</h3>
+                    <p id="jugador2-pais" class="text-secondary mb-0">..</p>
+                  </div>
+                  <span class="ranking-badge">#2</span>
+                </div>
+
+                <ul class="list-unstyled player-meta mb-0">
+                  <li><span>Fecha de nacimiento</span><strong id="jugador2-edad">..</strong></li>
+                  <li><span>Títulos</span><strong>4 GS</strong></li>
+                  <li><span>Superficie fuerte</span><strong>Clay</strong></li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-12 col-md-6 col-xl-4">
+            <article class="player-card card border-0 shadow-sm h-100">
+              <div class="player-card-top"></div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h3 id="jugador3-nombre" class="h5 mb-1">..</h3>
+                    <p id="jugador3-pais" class="text-secondary mb-0">...</p>
+                  </div>
+                  <span class="ranking-badge">#3</span>
+                </div>
+
+                <ul class="list-unstyled player-meta mb-0">
+                  <li><span>Fecha de nacimiento</span><strong id="jugador3-edad">..</strong></li>
+                  <li><span>Títulos</span><strong>2 GS</strong></li>
+                  <li><span>Superficie fuerte</span><strong>Hard</strong></li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+
+					<!-- Tabla ranking -->
+					<div class="card border-0 shadow-sm mt-4 rounded-4 overflow-hidden">
+						<div class="card-body p-0">
+							<div class="table-responsive">
+								<table class="table ranking-table mb-0 align-middle">
+									<thead>
+										<tr>
+											<th>Ranking</th>
+											<th>Jugador</th>
+											<th>País</th>
+											<th>Puntos</th>
+											<th>Victorias</th>
+											<th>Último torneo</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>#1</td>
+											<td>C. Alcaraz</td>
+											<td>España</td>
+											<td>13'550</td>
+											<td>.</td>
+											<td>.</td>
+										</tr>
+										<tr>
+											<td>#2</td>
+											<td>J. Sinner</td>
+											<td>Italia</td>
+											<td>11'400</td>
+											<td>.</td>
+											<td>.</td>
+										</tr>
+										<tr>
+											<td>#3</td>
+											<td>N. Djokovic</td>
+											<td>Serbia</td>
+											<td>5'370</td>
+											<td>.</td>
+											<td>.</td>
+										</tr>
+										<tr>
+											<td>#4</td>
+											<td>A. Zverev</td>
+											<td>Alemania</td>
+											<td>4'905</td>
+											<td>.</td>
+											<td>.</td>
+										</tr>
+										<tr>
+											<td>#5</td>
+											<td>L. Musetti</td>
+											<td>Italia</td>
+											<td>4'365</td>
+											<td>.</td>
+											<td>.</td>
+										</tr>
+										<tr>
+											<td>#6</td>
+											<td>A. de Miñaur</td>
+											<td>Australia</td>
+											<td>4'185</td>
+											<td>.</td>
+											<td>.</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- PARTIDOS -->
+			<section
+				id="partidos"
+				class="section-space">
+				<div class="container">
+					<div class="section-heading mb-4">
+						<span class="seccion-titulos">Calendario</span>
+						<h2 class="section-title mb-1">Partidos</h2>
+						<p class="section-subtitle mb-0">
+							Próximos encuentros destacados del circuito ATP.
+						</p>
+					</div>
+
+					<div class="d-flex flex-wrap gap-2 mb-4">
+						<button class="btn btn-success btn-sm rounded-pill px-3">
+							Todos
+						</button>
+						<button class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+							En vivo
+						</button>
+						<button class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+							Hoy
+						</button>
+						<button class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+							Mañana
+						</button>
+					</div>
+					<div><span class="match-tournament">Nombre torneo api</span></div>
+
+					<div class="match-list">
+						<article class="match-card card border-0 shadow-sm rounded-4 mb-3">
+							<div class="card-body">
+								<div class="row align-items-center gy-3">
+									<div class="col-12 col-lg-3">
+										<span class="match-tournament">....</span>
+									</div>
+									<div class="col-12 col-lg-5">
+										<div
+											class="d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3">
+											<div class="fw-semibold">api</div>
+											<span class="vs-badge">vs</span>
+											<div class="fw-semibold">api</div>
+										</div>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-center">
+										<span class="match-time">hora api</span>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-end">
+										<span class="match-status live">En vivo</span>
+									</div>
+								</div>
+							</div>
+						</article>
+
+						<article class="match-card card border-0 shadow-sm rounded-4 mb-3">
+							<div class="card-body">
+								<div class="row align-items-center gy-3">
+									<div class="col-12 col-lg-3">
+										<span class="match-tournament">....</span>
+									</div>
+									<div class="col-12 col-lg-5">
+										<div
+											class="d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3">
+											<div class="fw-semibold">....</div>
+											<span class="vs-badge">vs</span>
+											<div class="fw-semibold">....</div>
+										</div>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-center">
+										<span class="match-time">....</span>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-end">
+										<span class="match-status next">Próximo</span>
+									</div>
+								</div>
+							</div>
+						</article>
+
+						<article class="match-card card border-0 shadow-sm rounded-4 mb-3">
+							<div class="card-body">
+								<div class="row align-items-center gy-3">
+									<div class="col-12 col-lg-3">
+										<span class="match-tournament">....</span>
+									</div>
+									<div class="col-12 col-lg-5">
+										<div
+											class="d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3">
+											<div class="fw-semibold">....</div>
+											<span class="vs-badge">vs</span>
+											<div class="fw-semibold">....</div>
+										</div>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-center">
+										<span class="match-time">....</span>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-end">
+										<span class="match-status next">Próximo</span>
+									</div>
+								</div>
+							</div>
+						</article>
+
+						<article class="match-card card border-0 shadow-sm rounded-4 mb-3">
+							<div class="card-body">
+								<div class="row align-items-center gy-3">
+									<div class="col-12 col-lg-3">
+										<span class="match-tournament">....</span>
+									</div>
+									<div class="col-12 col-lg-5">
+										<div
+											class="d-flex flex-column flex-md-row align-items-md-center gap-2 gap-md-3">
+											<div class="fw-semibold">....</div>
+											<span class="vs-badge">vs</span>
+											<div class="fw-semibold">....</div>
+										</div>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-center">
+										<span class="match-time">...</span>
+									</div>
+									<div class="col-6 col-lg-2 text-lg-end">
+										<span class="match-status next">Próximo</span>
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+				</div>
+			</section>
+
+			<!-- ESTADÍSTICAS -->
+			<section
+				id="estadisticas"
+				class="section-space section-bottom-space">
+				<div class="container">
+					<div class="section-heading mb-4">
+						<span class="seccion-titulos">Análisis</span>
+						<h2 class="section-title mb-1">Estadísticas ATP</h2>
+						<p class="section-subtitle mb-0">
+							PONER GRAFICAS, ESTADISITICAS, ETC. 
+						</p>
+					</div>
+
+					<!-- Stats cards -->
+					<div class="row g-4 mb-4">
+						<div class="col-12 col-md-4">
+							<div class="stats-summary-card summary-green h-100">
+								<span class="summary-label">Ranking actual</span>
+								<h3 class="summary-value">Top 100</h3>
+							</div>
+						</div>
+						<div class="col-12 col-md-4">
+							<div class="stats-summary-card summary-blue h-100">
+								<span class="summary-label">Torneos 2026</span>
+								<h3 class="summary-value">68</h3>
+							</div>
+						</div>
+						<div class="col-12 col-md-4">
+							<div class="stats-summary-card summary-yellow h-100">
+								<span class="summary-label">Partidos jugados</span>
+								<h3 class="summary-value">1,247</h3>
+							</div>
+						</div>
+					</div>
+
+					
+
+						<!-- Grand Slams -->
+						<div class="col-12">
+							<div class="card border-0 shadow-sm rounded-4">
+								<div class="card-body p-4">
+									<h3 class="h5 mb-4">Títulos de Grand Slam · Era actual</h3>
+
+									<div class="row g-3">
+										<div class="col-6 col-md-3 col-xl-2">
+											<div class="slam-box">
+												<span class="slam-label">Djokovic</span>
+												<strong>24</strong>
+											</div>
+										</div>
+										<div class="col-6 col-md-3 col-xl-2">
+											<div class="slam-box">
+												<span class="slam-label">Alcaraz</span>
+												<strong>4</strong>
+											</div>
+										</div>
+										<div class="col-6 col-md-3 col-xl-2">
+											<div class="slam-box">
+												<span class="slam-label">Sinner</span>
+												<strong>2</strong>
+											</div>
+										</div>
+										<div class="col-6 col-md-3 col-xl-2">
+											<div class="slam-box">
+												<span class="slam-label">Medvedev</span>
+												<strong>1</strong>
+											</div>
+										</div>
+										<div class="col-6 col-md-3 col-xl-2">
+											<div class="slam-box">
+												<span class="slam-label">Zverev</span>
+												<strong>0</strong>
+											</div>
+										</div>
+										<div class="col-6 col-md-3 col-xl-2">
+											<div class="slam-box">
+												<span class="slam-label">Rublev</span>
+												<strong>0</strong>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+            <section id="comentarios" class="section-space section-bottom-space">
+	            <div class="container">
+		            <div class="section-heading mb-4">
+			            <span class="seccion-titulos">Opinión</span>
+			            <h2 class="section-title mb-1">Déjanos tu comentario</h2>
+		            </div>
+
+		        <div class="card border-0 shadow-sm rounded-4">
+			        <div class="card-body p-4">
+				        <form action="" method="post">
+					        <fieldset>
+						    <legend class="h5 mb-3">Formulario</legend>
+
+						    <div class="mb-3">
+							<label for="nombreComentario" class="form-label">Nombre</label>
+							<input
+								type="text"
+								id="nombreComentario"
+								name="nombreComentario"
+								class="form-control"
+								placeholder="Escribe tu nombre" />
+						    </div>
+
+						    <div class="mb-3">
+							<label for="textoComentario" class="form-label">Comentario</label>
+							<textarea
+								id="textoComentario"
+								name="textoComentario"
+								class="form-control"
+								rows="3"
+								placeholder="Escribe un comentario corto sobre el tenis"></textarea>
+						    </div>
+					        </fieldset>
+				        </form>
+
+				<div class="d-flex flex-wrap gap-2">
+					<button onclick="guardarComentario()" class="btn btn-success">
+						Guardar comentario
+					</button>
+					<button onclick="verComentario()" class="btn btn-outline-secondary">
+						Mostrar comentario
+					</button>
+					<button onclick="borrarComentario()" class="btn btn-outline-danger">
+						Borrar comentario
+					</button>
+				</div>
+
+				<div id="resultadoComentario" class="mt-4"></div>
+			    </div>
+		    </div>
+	        </div>
+        </section>
+		</main>
+
+		<footer class="site-footer py-4">
+			<div class="container">
+				<div
+					class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+					<p class="mb-0">© 2026 ATP Tour Central</p>
+					<p class="mb-0 small">
+						Encuentra todo lo que necesitas saber del mundo del tenis
+					</p>
+				</div>
+			</div>
+		</footer>
+
+		
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script type="module" src="js/script.js"></script>
+
+        
+	</body>
+</html>
