@@ -10,13 +10,7 @@
 		<link rel="stylesheet" href="css/styles.css" />
 	
 		<style>
-		/* 
-		 * styles.css línea 38: `.nav-link { color: white }` afecta a TODOS los nav-link,
-		 * incluyendo los tabs de estadísticas. La solución definitiva es usar un selector
-		 * que apunte directamente al elemento con mayor especificidad que styles.css.
-		 * styles.css usa: `.brand-title, .nav-link` (especificidad 0,1,0)
-		 * Necesitamos al menos 0,2,0 para ganarle.
-		 */
+
 		.nav-tabs#statsTab .nav-link.tab-btn {
 			color: var(--bs-body-color) !important;
 			background-color: var(--bs-tertiary-bg);

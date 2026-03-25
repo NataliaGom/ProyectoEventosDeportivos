@@ -49,7 +49,9 @@ document.querySelectorAll('.tab-btn').forEach(function(btn) {
   });
 });
 
-
+// ─────────────────────────────────────────
+// RANKINGS — ATP via ESPN, WTA via api-tennis.com
+// ─────────────────────────────────────────
 async function loadRankings(league) {
   currentLeague = league;
 
@@ -87,7 +89,7 @@ async function loadRankings(league) {
   }
 }
 
-// ATP: ESPN 
+
 async function loadRankingsATP() {
   var url = 'https://sports.core.api.espn.com/v2/sports/tennis/leagues/atp/seasons/2026/types/2/weeks/11/rankings/1?lang=en&region=us';
   var res  = await fetch(url);
@@ -120,7 +122,7 @@ async function resolverAtletaESPN(rankEntry) {
   } catch(e) { return null; }
 }
 
-// WTA: api-tennis.com 
+
 async function loadRankingsWTA() {
   var data = await tennisApiCall({ method: 'get_standings', event_type: 'WTA' });
   if (!data || !data.length) throw new Error('Sin ranks WTA');
@@ -131,7 +133,7 @@ async function loadRankingsWTA() {
       points:  parseInt(p.points) || 0,
       nombre:  p.player   || '–',
       pais:    p.country  || '–',
-      bandera: '',   // api-tennis no nos devuelve bandera
+      bandera: '',   // api-tennis no devuelve bandera
       foto:    '',
       id:      p.player_key || ''
     };
@@ -171,7 +173,7 @@ function renderRankings(jugadores, league) {
   if (rankChart) rankChart.destroy();
   var isDark     = document.documentElement.getAttribute('data-bs-theme') === 'dark';
   var gridColor  = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-  var labelColor = isDark ? '#adb5bd' : '#6c757d';
+  var labelColor = isDark ? '#dee2e6' : '#495057';  
   var ctx = document.getElementById('rankings-chart').getContext('2d');
   rankChart = new Chart(ctx, {
     type: 'bar',
@@ -213,10 +215,16 @@ function renderRankings(jugadores, league) {
 
   if (paisesChart) paisesChart.destroy();
   var ctx2 = document.getElementById('paises-chart').getContext('2d');
+
+
+  var labelsConConteo = paisesOrdenados.map(function(p) {
+    return p + ' (' + conteo[p] + ')';
+  });
+
   paisesChart = new Chart(ctx2, {
     type: 'doughnut',
     data: {
-      labels: paisesOrdenados,
+      labels: labelsConConteo,
       datasets: [{
         data: paisesOrdenados.map(function(p) { return conteo[p]; }),
         backgroundColor: paisesOrdenados.map(function(_, i) { return COLORES[i % COLORES.length]; }),
@@ -229,25 +237,19 @@ function renderRankings(jugadores, league) {
       plugins: {
         legend: {
           position: 'right',
-          labels: { color: labelColor, padding: 12, font: { size: 12 },
-            generateLabels: function(chart) {
-              var data = chart.data;
-              return data.labels.map(function(label, i) {
-                return {
-                  text: label + ' (' + data.datasets[0].data[i] + ')',
-                  fillStyle: data.datasets[0].backgroundColor[i],
-                  strokeStyle: data.datasets[0].borderColor,
-                  lineWidth: 1,
-                  index: i
-                };
-              });
-            }
+          labels: {
+            color: labelColor,   
+            padding: 14,
+            font: { size: 12 },
+            boxWidth: 14,
+            boxHeight: 14
           }
         },
         tooltip: {
           callbacks: {
             label: function(ctx) {
-              return ' ' + ctx.label + ': ' + ctx.parsed + ' jugador' + (ctx.parsed > 1 ? 'es' : '');
+              var n = ctx.parsed;
+              return ' ' + ctx.label.split(' (')[0] + ': ' + n + ' jugador' + (n > 1 ? 'es' : '');
             }
           }
         }
@@ -349,7 +351,7 @@ async function loadPlayer() {
   document.getElementById('player-result').innerHTML = '';
   try {
     if (playerSource === 'tennis-api') {
-      // Jugadora WTA: usar api-tennis.com (por que hay probkemas si intento usar ESPN para WTA, no devuelve datos de nadie)
+      // Jugadora WTA: usar api-tennis.com
       var data = await tennisApiCall({ method: 'get_players', player_key: key });
       if (!data || !data.length) throw new Error('Jugadora no encontrada');
       setEstado('jugador', 'ok', '');
