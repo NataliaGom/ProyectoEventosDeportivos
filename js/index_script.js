@@ -2,6 +2,44 @@
 //        PARTIDO EN VIVO - INDEX           //
 // *****************************************//
 
+function formatearNombreJugadorIndex(athlete) {
+    if (!athlete || !athlete.displayName) return 'Jugador';
+    
+    const nombreCompleto = athlete.displayName;
+    const partes = nombreCompleto.split(' ');
+    
+    if (partes.length >= 2) {
+        const inicial = partes[0].charAt(0);
+        const apellido = partes[partes.length - 1];
+        return `${inicial}. ${apellido}`;
+    }
+    
+    return nombreCompleto;
+}
+
+function procesarEquipoIndex(competitors) {
+    if (!competitors || competitors.length === 0) return null;
+    
+    if (competitors.length === 1) {
+        const jugador = competitors[0];
+        return {
+            nombre: formatearNombreJugadorIndex(jugador.athlete),
+            pais: jugador.athlete?.flag?.alt || '',
+            esEquipo: false
+        };
+    }
+    
+    const nombres = competitors.map(comp => formatearNombreJugadorIndex(comp.athlete));
+    const paises = competitors.map(comp => comp.athlete?.flag?.alt || '');
+    const paisesUnicos = [...new Set(paises.filter(p => p !== ''))];
+    
+    return {
+        nombre: nombres.join(' / '),
+        pais: paisesUnicos.length === 1 ? paisesUnicos[0] : paises.join(' / '),
+        esEquipo: true
+    };
+}
+
 async function obtenerPartidosATPIndex() {
     const url = 'https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard';
     
@@ -55,32 +93,39 @@ function procesarPartidoIndex(partido, categoria, nombreTorneo) {
     if (!isLive) return null;
     
     const competitors = partido.competitors || [];
-    let jugador1 = null;
-    let jugador2 = null;
+    
+    if (competitors.length < 2) return null;
+    
+    const equipo1 = [];
+    const equipo2 = [];
     
     competitors.forEach(competitor => {
-        if (competitor.order === 1) jugador1 = competitor;
-        if (competitor.order === 2) jugador2 = competitor;
+        if (competitor.order === 1) {
+            equipo1.push(competitor);
+        } else if (competitor.order === 2) {
+            equipo2.push(competitor);
+        }
     });
     
-    if (!jugador1 || !jugador2) return null;
+    if (equipo1.length === 0 || equipo2.length === 0) return null;
     
-    const nombreJugador1 = jugador1.athlete?.displayName || 'Jugador 1';
-    const nombreJugador2 = jugador2.athlete?.displayName || 'Jugador 2';
-    const paisJugador1 = jugador1.athlete?.flag?.alt || '';
-    const paisJugador2 = jugador2.athlete?.flag?.alt || '';
+    const infoEquipo1 = procesarEquipoIndex(equipo1);
+    const infoEquipo2 = procesarEquipoIndex(equipo2);
     
     const round = partido.round?.displayName || categoria || 'Ronda no especificada';
     
     let marcador = '';
     let sets = [];
     
-    if (jugador1.linescores && jugador2.linescores) {
-        for (let i = 0; i < jugador1.linescores.length; i++) {
-            const score1 = jugador1.linescores[i]?.value || 0;
-            const score2 = jugador2.linescores[i]?.value || 0;
-            const tiebreak1 = jugador1.linescores[i]?.tiebreak;
-            const tiebreak2 = jugador2.linescores[i]?.tiebreak;
+    const jugadorReferencia1 = equipo1[0];
+    const jugadorReferencia2 = equipo2[0];
+    
+    if (jugadorReferencia1.linescores && jugadorReferencia2.linescores) {
+        for (let i = 0; i < jugadorReferencia1.linescores.length; i++) {
+            const score1 = jugadorReferencia1.linescores[i]?.value || 0;
+            const score2 = jugadorReferencia2.linescores[i]?.value || 0;
+            const tiebreak1 = jugadorReferencia1.linescores[i]?.tiebreak;
+            const tiebreak2 = jugadorReferencia2.linescores[i]?.tiebreak;
             
             let setText = `${score1}-${score2}`;
             if (tiebreak1 || tiebreak2) {
@@ -94,15 +139,17 @@ function procesarPartidoIndex(partido, categoria, nombreTorneo) {
         }
     }
     
+    const esDobles = (equipo1.length > 1 || equipo2.length > 1);
+    
     return {
         torneo: nombreTorneo,
         categoria: categoria,
         round: round,
-        jugador1: nombreJugador1,
-        jugador2: nombreJugador2,
-        pais1: paisJugador1,
-        pais2: paisJugador2,
-        marcador: marcador
+        equipo1: infoEquipo1,
+        equipo2: infoEquipo2,
+        esDobles: esDobles,
+        marcador: marcador,
+        sets: sets
     };
 }
 
@@ -116,11 +163,16 @@ async function actualizarPartidoEnVivo() {
     if (partidosEnVivo.length > 0) {
         const partido = partidosEnVivo[0];
         
-        document.getElementById('live-partido').innerHTML = `${partido.pais1 ? `[${partido.pais1}] ` : ''}${partido.jugador1} <span class="text-danger">vs</span> ${partido.pais2 ? `[${partido.pais2}] ` : ''}${partido.jugador2}`;
-        document.getElementById('live-detalle').innerHTML = `${partido.categoria || 'ATP Tour'} · ${partido.round}`;
+        const nombreEquipo1 = partido.equipo1.nombre;
+        const nombreEquipo2 = partido.equipo2.nombre;
+        const paisEquipo1 = partido.equipo1.pais;
+        const paisEquipo2 = partido.equipo2.pais;
+        
+        document.getElementById('live-partido').innerHTML = `${paisEquipo1 ? `[${paisEquipo1}] ` : ''}${nombreEquipo1} <span class="text-danger">vs</span> ${paisEquipo2 ? `[${paisEquipo2}] ` : ''}${nombreEquipo2}`;
+        document.getElementById('live-detalle').innerHTML = `${partido.categoria || 'ATP Tour'} · ${partido.round}${partido.esDobles ? ' · Dobles' : ''}`;
         document.getElementById('live-torneo').innerHTML = partido.torneo.length > 20 ? partido.torneo.substring(0, 20) + '...' : partido.torneo;
         document.getElementById('live-ronda').innerHTML = partido.round;
-        document.getElementById('live-marcador').innerHTML = partido.marcador || 'En juego';
+        document.getElementById('live-marcador').innerHTML = partido.marcador || (partido.sets.length > 0 ? partido.sets[partido.sets.length - 1] : 'En juego');
         
         liveBanner.style.display = 'block';
         noLiveBanner.style.display = 'none';
