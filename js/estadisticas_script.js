@@ -1,28 +1,3 @@
-const API_KEY_TENNIS = 'fcd8e4e3602130a6a1df894b6c5549eb9ae9a5859896677164ba5fea76b271c5';
-const TENNIS_BASE    = 'https://api.api-tennis.com/tennis/';
-const PROXIES        = [
-  function(u) { return 'https://corsproxy.io/?' + encodeURIComponent(u); },
-  function(u) { return 'https://api.allorigins.win/get?url=' + encodeURIComponent(u); }
-];
-
-async function tennisApiCall(params) {
-  var qs  = new URLSearchParams({ ...params, APIkey: API_KEY_TENNIS }).toString();
-  var url = TENNIS_BASE + '?' + qs;
-  var lastErr = new Error('Sin conexión');
-  for (var i = 0; i < PROXIES.length; i++) {
-    try {
-      var res = await fetch(PROXIES[i](url));
-      if (!res.ok) { lastErr = new Error('Proxy HTTP ' + res.status); continue; }
-      var raw = await res.text();
-      if (!raw) { lastErr = new Error('Respuesta vacía'); continue; }
-      var parsed = JSON.parse(raw);
-      if (parsed && parsed.contents !== undefined) parsed = JSON.parse(parsed.contents);
-      if (!parsed || String(parsed.success) === '0') throw new Error('API error');
-      return parsed.result;
-    } catch(e) { lastErr = e; }
-  }
-  throw lastErr;
-}
 
 // ─────────────────────────────────────────
 // ESTADO GLOBAL
@@ -30,9 +5,8 @@ async function tennisApiCall(params) {
 var resultsLoaded = false;
 var rankChart     = null;
 var paisesChart   = null;
-var rankCache     = { ATP: null, WTA: null };
+var rankCache     = { ATP: null };
 var currentLeague = 'ATP';
-var playerSource  = 'espn';   // 'espn' o 'tennis-api'
 
 // ─────────────────────────────────────────
 // TABS
@@ -50,20 +24,13 @@ document.querySelectorAll('.tab-btn').forEach(function(btn) {
 });
 
 // ─────────────────────────────────────────
-// RANKINGS — ATP via ESPN, WTA via api-tennis.com
+// RANKINGS — ATP via ESPN
 // ─────────────────────────────────────────
 async function loadRankings(league) {
   currentLeague = league;
 
-  document.getElementById('btn-atp').className = league === 'ATP'
-    ? 'btn btn-success btn-sm rounded-pill px-3'
-    : 'btn btn-outline-secondary btn-sm rounded-pill px-3';
-  document.getElementById('btn-wta').className = league === 'WTA'
-    ? 'btn btn-success btn-sm rounded-pill px-3'
-    : 'btn btn-outline-secondary btn-sm rounded-pill px-3';
-
-  document.getElementById('rankings-title').textContent = 'Ranking ' + league;
-  document.getElementById('chart-title').textContent    = 'Top 10 · Puntos ' + league;
+  document.getElementById('rankings-title').textContent = 'Ranking ATP';
+  document.getElementById('chart-title').textContent    = 'Top 10 · Puntos ATP';
   document.getElementById('tabla-rankings-wrap').style.display = 'none';
   document.getElementById('rankings-body').innerHTML = '';
   if (rankChart)  { rankChart.destroy();  rankChart  = null; }
@@ -74,9 +41,7 @@ async function loadRankings(league) {
   setEstado('rankings', 'loading', 'Cargando ' + league + '...');
 
   try {
-    var jugadores = league === 'ATP'
-      ? await loadRankingsATP()
-      : await loadRankingsWTA();
+    var jugadores = await loadRankingsATP();
 
     if (!jugadores || jugadores.length === 0)
       throw new Error('Sin datos de ranking para ' + league);
@@ -122,23 +87,6 @@ async function resolverAtletaESPN(rankEntry) {
   } catch(e) { return null; }
 }
 
-
-async function loadRankingsWTA() {
-  var data = await tennisApiCall({ method: 'get_standings', event_type: 'WTA' });
-  if (!data || !data.length) throw new Error('Sin ranks WTA');
-
-  return data.slice(0, 20).map(function(p) {
-    return {
-      ranking: parseInt(p.place) || '–',
-      points:  parseInt(p.points) || 0,
-      nombre:  p.player   || '–',
-      pais:    p.country  || '–',
-      bandera: '',   // api-tennis no devuelve bandera
-      foto:    '',
-      id:      p.player_key || ''
-    };
-  });
-}
 
 function renderRankings(jugadores, league) {
   currentLeague = league;
@@ -211,11 +159,10 @@ function renderRankings(jugadores, league) {
     '#6f42c1','#fd7e14','#0dcaf0','#6c757d','#d63384'
   ];
 
-  document.getElementById('paises-title').textContent = 'Países · Top 20 ' + league;
+  document.getElementById('paises-title').textContent = 'Países · Top 20 ATP';
 
   if (paisesChart) paisesChart.destroy();
   var ctx2 = document.getElementById('paises-chart').getContext('2d');
-
 
   var labelsConConteo = paisesOrdenados.map(function(p) {
     return p + ' (' + conteo[p] + ')';
@@ -266,25 +213,21 @@ function seleccionarJugador(athleteId, nombre) {
   document.getElementById('panel-resultados').style.display = 'none';
   document.getElementById('panel-jugador').style.display    = '';
   document.getElementById('inputJugadorIdStats').value      = athleteId;
-  // Marcar la fuente según qué ranking estaba activo
-  playerSource = currentLeague === 'WTA' ? 'tennis-api' : 'espn';
   document.getElementById('estado-jugador').innerHTML =
     '<span class="text-body-secondary small">Seleccionado: <strong>' + nombre + '</strong></span>';
   loadPlayer();
 }
 
 // ─────────────────────────────────────────
-// RESULTADOS — ESPN scoreboard ATP + WTA
+// RESULTADOS — ESPN scoreboard ATP
 // ─────────────────────────────────────────
 async function loadResults() {
   resultsLoaded = true;
   try {
     var resATP = await fetch('https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard');
-    var resWTA = await fetch('https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard');
-    if (!resATP.ok || !resWTA.ok) throw new Error('Error al cargar scoreboard');
+    if (!resATP.ok) throw new Error('Error al cargar scoreboard');
     var dataATP = await resATP.json();
-    var dataWTA = await resWTA.json();
-    var todos   = extraerPartidos(dataATP, 'ATP').concat(extraerPartidos(dataWTA, 'WTA'));
+    var todos   = extraerPartidos(dataATP, 'ATP');
     var fin     = todos.filter(function(p) { return p.estado === 'final'; });
 
     setEstado('resultados', 'ok', '');
@@ -350,21 +293,12 @@ async function loadPlayer() {
   setEstado('jugador', 'loading', 'Buscando jugador...');
   document.getElementById('player-result').innerHTML = '';
   try {
-    if (playerSource === 'tennis-api') {
-      // Jugadora WTA: usar api-tennis.com
-      var data = await tennisApiCall({ method: 'get_players', player_key: key });
-      if (!data || !data.length) throw new Error('Jugadora no encontrada');
-      setEstado('jugador', 'ok', '');
-      renderPlayerTennisApi(data[0]);
-    } else {
-      // Jugador ATP: usar ESPN
-      var res = await fetch('https://sports.core.api.espn.com/v2/sports/tennis/athletes/' + key + '?lang=en&region=us');
-      if (!res.ok) throw new Error('Jugador no encontrado (HTTP ' + res.status + ')');
-      var athlete = await res.json();
-      if (!athlete || !athlete.id) throw new Error('Jugador no encontrado');
-      setEstado('jugador', 'ok', '');
-      renderPlayer(athlete);
-    }
+    var res = await fetch('https://sports.core.api.espn.com/v2/sports/tennis/athletes/' + key + '?lang=en&region=us');
+    if (!res.ok) throw new Error('Jugador/a no encontrado (HTTP ' + res.status + ')');
+    var athlete = await res.json();
+    if (!athlete || !athlete.id) throw new Error('Jugador/a no encontrado');
+    setEstado('jugador', 'ok', '');
+    renderPlayer(athlete);
   } catch(e) { setEstado('jugador', 'error', e.message); }
 }
 
@@ -411,58 +345,6 @@ function renderPlayer(athlete) {
     + sbox('summary-blue',   'Peso',   peso)
     + sbox('summary-yellow', 'Altura', altura)
     + sbox('summary-green',  'Status', status)
-    + '</div></div></div>';
-}
-
-function renderPlayerTennisApi(p) {
-  var nombre  = p.player_name    || '–';
-  var pais    = p.player_country || '–';
-  var foto    = p.player_logo    || '';
-  var bday    = p.player_bday    || '–';
-
-  var stats   = p.stats || [];
-  var singles = stats.filter(function(s) { return s.type === 'singles'; })
-                     .sort(function(a, b) { return b.season - a.season; });
-  var s = singles[0] || {};
-
-  var won    = parseInt(s.matches_won  || 0);
-  var lost   = parseInt(s.matches_lost || 0);
-  var titles = parseInt(s.titles       || 0);
-  var total  = won + lost;
-  var pct    = total ? Math.round(won / total * 100) : 0;
-  var rank   = s.rank    || '–';
-  var season = s.season  || '–';
-
-  var fotoHtml = foto
-    ? '<img src="' + foto + '" alt="' + nombre
-      + '" class="rounded-circle border" style="width:80px;height:80px;object-fit:cover;border-color:rgba(25,135,84,.4)!important"'
-      + ' onerror="this.style.display=\'none\'">'
-    : '<span style="font-size:2.5rem">&#127926;</span>';
-
-  // Superficie con más victorias
-  var surfStats = [
-    { name: 'Hard',  won: parseInt(s.hard_won  || 0) },
-    { name: 'Clay',  won: parseInt(s.clay_won  || 0) },
-    { name: 'Grass', won: parseInt(s.grass_won || 0) }
-  ].sort(function(a,b){ return b.won - a.won; });
-  var bestSurface = surfStats[0].won > 0 ? surfStats[0].name + ' (' + surfStats[0].won + ' vic.)' : '–';
-
-  document.getElementById('player-result').innerHTML =
-    '<div class="card border-0 shadow-sm rounded-4"><div class="card-body p-4">'
-    + '<div class="d-flex align-items-center gap-3 mb-4">' + fotoHtml
-    + '<div><h3 class="h4 mb-1">' + nombre + '</h3>'
-    + '<div class="d-flex flex-wrap gap-2 text-body-secondary small">'
-    + '<span>🌍 ' + pais + '</span>'
-    + '<span>🎂 ' + bday + '</span>'
-    + '<span>📅 Temporada ' + season + '</span>'
-    + '</div></div></div>'
-    + '<div class="row g-3">'
-    + sbox('summary-green',  'Ranking WTA', '#' + rank)
-    + sbox('summary-green',  'Victorias',   won)
-    + sbox('summary-blue',   'Derrotas',    lost)
-    + sbox('summary-yellow', '% Victorias', pct + '%')
-    + sbox('summary-green',  'Títulos',     titles)
-    + sbox('summary-blue',   'Mejor sup.',  bestSurface)
     + '</div></div></div>';
 }
 
