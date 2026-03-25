@@ -99,7 +99,53 @@
     font-weight: 600;
 }
 
-/* modo oscuro amigable */
+.jugador-buscado-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* FOTO */
+.jugador-buscado-foto {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border: 3px solid rgba(25, 135, 84, 0.25);
+    background-color: #fff;
+}
+
+/* placeholder si no hay foto */
+.jugador-buscado-foto-placeholder {
+    width: 220px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(25, 135, 84, 0.08);
+    color: #198754;
+    font-weight: 600;
+    border: 2px dashed rgba(25, 135, 84, 0.3);
+}
+
+/* cajas de info */
+.dato-jugador-box {
+    background: rgba(25, 135, 84, 0.05);
+    border-radius: 0.9rem;
+    padding: 0.8rem 1rem;
+    height: 100%;
+    text-align: center;
+}
+
+/* label chiquito */
+.dato-jugador-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    margin-bottom: 0.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* modo oscuro  */
 [data-bs-theme="dark"] .table-ranking thead th {
     background-color: #157347;
     color: white;
