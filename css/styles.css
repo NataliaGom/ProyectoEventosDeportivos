@@ -515,6 +515,7 @@ body {
 .nav-tabs .nav-link.active::before {
     width: 30px;
 }
+
 /* Estilo para el contador de partidos */
 #tournament-info .badge.bg-info {
     background-color: var(--tennis-blue) !important;
