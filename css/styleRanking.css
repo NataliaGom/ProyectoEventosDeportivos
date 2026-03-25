@@ -1,0 +1,123 @@
+
+
+.table-responsive {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.table-ranking {
+    margin-bottom: 0;
+    background-color: var(--bs-body-bg);
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-ranking thead th {
+    background-color: #198754;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    padding: 0.95rem 1rem;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+
+.table-ranking tbody tr {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.table-ranking tbody tr:nth-child(even) {
+    background-color: rgba(25, 135, 84, 0.04);
+}
+
+.table-ranking tbody tr:hover {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.table-ranking tbody td {
+    padding: 0.9rem 1rem;
+    vertical-align: middle;
+    border-color: rgba(0, 0, 0, 0.08);
+    font-size: 0.96rem;
+}
+
+.table-ranking tbody td:first-child {
+    font-weight: 700;
+    color: #198754;
+    width: 90px;
+}
+
+.table-ranking a {
+    color: #198754;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.table-ranking a:hover {
+    text-decoration: underline;
+}
+
+/* FOTO JUGADOR */
+.jugador-foto {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid rgba(25, 135, 84, 0.3);
+}
+
+/* BANDERA */
+.bandera-pais {
+    width: 20px;
+    height: 14px;
+    object-fit: cover;
+    border-radius: 3px;
+}
+
+/* alineación bonita */
+.table-ranking td {
+    vertical-align: middle;
+}
+
+/* estado de carga */
+#estadoRanking {
+    font-weight: 500;
+    color: var(--bs-secondary-color);
+}
+
+/* paginación */
+#info-paginacion-ranking {
+    font-size: 0.95rem;
+}
+
+#btn-anterior-ranking,
+#btn-siguiente-ranking {
+    min-width: 110px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+/* modo oscuro amigable */
+[data-bs-theme="dark"] .table-ranking thead th {
+    background-color: #157347;
+    color: white;
+}
+
+[data-bs-theme="dark"] .table-ranking tbody tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+[data-bs-theme="dark"] .table-ranking tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .table-ranking tbody td {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-bs-theme="dark"] .table-ranking tbody td:first-child,
+[data-bs-theme="dark"] .table-ranking a {
+    color: #57d38c;
+}
