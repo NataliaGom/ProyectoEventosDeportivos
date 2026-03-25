@@ -433,32 +433,6 @@ body {
 .match-card .border-top {
     border-color: var(--bs-border-color) !important;
 }
-/* Estilos para las pestañas ATP/WTA */
-.nav-tabs .nav-link {
-    border: none;
-    background-color: var(--bs-tertiary-bg);
-    color: var(--bs-body-color);
-    padding: 0.6rem 1.2rem;
-    border-radius: 40px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.nav-tabs .nav-link:hover {
-    background-color: var(--tennis-green);
-    color: white;
-    transform: translateY(-2px);
-}
-
-.nav-tabs .nav-link.active {
-    background: linear-gradient(135deg, var(--tennis-green), var(--tennis-green-dark));
-    color: white;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-
-.nav-tabs .nav-link i {
-    font-size: 0.9rem;
-}
 
 /* Estilos para los badges de sets */
 .match-card .badge.bg-light {
@@ -492,28 +466,6 @@ body {
 
 .match-card .border-top {
     border-color: var(--bs-border-color) !important;
-}
-
-/* Animación para los tabs */
-.nav-tabs .nav-link {
-    position: relative;
-    overflow: hidden;
-}
-
-.nav-tabs .nav-link::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: white;
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-}
-
-.nav-tabs .nav-link.active::before {
-    width: 30px;
 }
 
 /* Estilo para el contador de partidos */

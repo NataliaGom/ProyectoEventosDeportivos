@@ -1,184 +1,3 @@
-// *********************************//
-//       ENDPOINT jugador ID        //
-// *********************************//
-
-async function obtenerJugadorPorId(jugadorId) {
-    const url = `https://sports.core.api.espn.com/v2/sports/tennis/athletes/${jugadorId}?lang=en&region=us`;
-
-    try {
-        const respuesta = await fetch(url);
-
-        if (!respuesta.ok) {
-            throw new Error(`HTTP error! status: ${respuesta.status}`);
-        }
-
-        const athlete = await respuesta.json();
-        return athlete;
-
-    } catch (error) {
-        console.error('Error al obtener jugador por ID:', error);
-        return null;
-    }
-}
-
-function procesarJugadorBuscado(athlete) {
-    if (!athlete) {
-        return null;
-    }
-
-    let pais = 'N/D';
-
-    if (athlete.flag && athlete.flag.alt) {
-        pais = athlete.flag.alt;
-    } 
-
-    if (athlete.links && athlete.links.length > 0) {
-        const linkPlayerCard = athlete.links.find(link =>
-            link.rel && link.rel.includes('playercard') && link.href
-        );
-
-        if (linkPlayerCard) {
-            linkJugador = linkPlayerCard.href;
-        } else if (athlete.links[0].href) {
-            linkJugador = athlete.links[0].href;
-        }
-    }
-
-    return {
-        id: athlete.id || 'N/D',
-        nombre: athlete.shortName || athlete.displayName || 'N/D',
-        nombreCompleto: athlete.fullName || 'N/D',
-        edad: athlete.age || 'N/D',
-        pais: pais,
-        debutYear: athlete.debutYear || 'N/D',
-        foto: athlete.headshot?.href || '',
-        bandera: athlete.flag?.href || '',
-        link: linkJugador
-    };
-}
-
-function renderizarJugadorBuscado(jugador) {
-    const contenedor = document.getElementById('resultadoBusquedaJugador');
-
-    if (!contenedor) return;
-
-    if (!jugador) {
-        contenedor.innerHTML = `
-            <div class="alert alert-warning mb-0">
-                No se encontró información del jugador.
-            </div>
-        `;
-        return;
-    }
-
-    contenedor.innerHTML = `
-        <div class="card jugador-buscado-card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
-                    <div class="text-center">
-                        ${
-                            jugador.foto
-                                ? `<img src="${jugador.foto}" alt="${jugador.nombre}" class="jugador-buscado-foto">`
-                                : `<div class="jugador-buscado-foto-placeholder">Sin foto</div>`
-                        }
-                    </div>
-
-                    <div class="flex-grow-1">
-                        <h4 class="mb-1">${jugador.nombreCompleto}</h4>
-                        <p class="text-body-secondary mb-3">ID: ${jugador.id}</p>
-
-                        <div class="row g-3">
-                            <div class="col-sm-6 col-lg-3">
-                                <div class="dato-jugador-box">
-                                    <span class="dato-jugador-label">Short Name</span>
-                                    <strong>${jugador.nombre}</strong>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6 col-lg-3">
-                                <div class="dato-jugador-box">
-                                    <span class="dato-jugador-label">Edad</span>
-                                    <strong>${jugador.edad}</strong>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6 col-lg-3">
-                                <div class="dato-jugador-box">
-                                    <span class="dato-jugador-label">País</span>
-                                    <div class="d-flex align-items-center gap-2 justify-content-center justify-content-sm-start">
-                                        <strong>${jugador.pais}</strong>
-                                        ${
-                                            jugador.bandera
-                                                ? `<img src="${jugador.bandera}" alt="${jugador.pais}" class="bandera-pais">`
-                                                : ''
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-sm-6 col-lg-3">
-                                <div class="dato-jugador-box">
-                                    <span class="dato-jugador-label">Año debut</span>
-                                    <strong>${jugador.debutYear}</strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-3">
-                            ${
-                                jugador.link !== 'N/D'
-                                    ? `<a href="${jugador.link}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-sm">Ver perfil ESPN</a>`
-                                    : ''
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-async function buscarJugadorPorId() {
-    const input = document.getElementById('inputJugadorId');
-    const estado = document.getElementById('estadoBusquedaJugador');
-    const resultado = document.getElementById('resultadoBusquedaJugador');
-
-    if (!input || !estado || !resultado) return;
-
-    const jugadorId = input.value.trim();
-
-    if (jugadorId === '') {
-        estado.innerHTML = '<div class="alert alert-warning mb-0">Escribe un ID de jugador.</div>';
-        resultado.innerHTML = '';
-        return;
-    }
-
-    estado.innerHTML = '<div class="alert alert-info mb-0">Buscando jugador...</div>';
-    resultado.innerHTML = '';
-
-    const athlete = await obtenerJugadorPorId(jugadorId);
-
-    if (!athlete) {
-        estado.innerHTML = '<div class="alert alert-danger mb-0">No se pudo obtener el jugador.</div>';
-        resultado.innerHTML = '';
-        return;
-    }
-
-    const jugadorProcesado = procesarJugadorBuscado(athlete);
-
-    estado.innerHTML = '';
-    renderizarJugadorBuscado(jugadorProcesado);
-}
-
-function limpiarBusquedaJugador() {
-    const input = document.getElementById('inputJugadorId');
-    const estado = document.getElementById('estadoBusquedaJugador');
-    const resultado = document.getElementById('resultadoBusquedaJugador');
-
-    if (input) input.value = '';
-    if (estado) estado.innerHTML = '';
-    if (resultado) resultado.innerHTML = '';
-}
 
 // *********************************//
 //            RANKING              //
@@ -275,7 +94,9 @@ async function procesarJugadorRanking(jugadorRanking) {
             debutYear: athlete.debutYear || 'N/D',
             link: linkJugador,
             foto: athlete.headshot?.href || '',
-            bandera: athlete.flag?.href || ''
+            bandera: athlete.flag?.href || '',
+            athleteRef: athleteRefSeguro, 
+            athleteId: athlete.id || ''
         };
 
     } catch (error) {
@@ -359,6 +180,165 @@ function paginaAnteriorRanking() {
     }
 }
 
+
+function renderizarJugadorBuscado(jugador) {
+    const contenedor = document.getElementById('resultadoBusquedaJugador');
+
+    if (!jugador) {
+        contenedor.innerHTML = `
+            <div class="alert alert-warning mb-0">
+                No se encontró información del jugador.
+            </div>
+        `;
+        return;
+    }
+
+    contenedor.innerHTML = `
+        <div class="card jugador-buscado-card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex flex-column flex-md-row align-items-md-center gap-4">
+                    <div class="text-center">
+                        ${
+                            jugador.foto
+                                ? `<img src="${jugador.foto}" alt="${jugador.nombre}" class="jugador-buscado-foto">`
+                                : `<div class="jugador-buscado-foto-placeholder">Sin foto</div>`
+                        }
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <h4 class="mb-1">${jugador.nombre}</h4>
+                        <p class="text-body-secondary mb-3">Ranking: ${jugador.ranking}</p>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="dato-jugador-box">
+                                    <span class="dato-jugador-label">Edad</span>
+                                    <strong>${jugador.edad}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="dato-jugador-box">
+                                    <span class="dato-jugador-label">País</span>
+                                    <div class="d-flex align-items-center gap-2 justify-content-center justify-content-sm-start">
+                                        <strong>${jugador.pais}</strong>
+                                        ${
+                                            jugador.bandera
+                                                ? `<img src="${jugador.bandera}" alt="${jugador.pais}" class="bandera-pais">`
+                                                : ''
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="dato-jugador-box">
+                                    <span class="dato-jugador-label">Año debut</span>
+                                    <strong>${jugador.debutYear}</strong>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-lg-3">
+                                <div class="dato-jugador-box">
+                                    <span class="dato-jugador-label">ID ESPN</span>
+                                    <strong>${jugador.athleteId || 'N/D'}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            ${
+                                jugador.link !== 'N/D'
+                                    ? `<a href="${jugador.link}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success btn-sm">Ver perfil ESPN</a>`
+                                    : ''
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+
+function buscarJugadorPorRanking() {
+    const input = document.getElementById('inputJugadorRanking');
+    const estado = document.getElementById('estadoBusquedaJugador');
+    const resultado = document.getElementById('resultadoBusquedaJugador');
+
+    if (!input || !estado || !resultado) return;
+
+    const rankingBuscado = input.value.trim();
+
+    if (rankingBuscado === '') {
+        estado.innerHTML = '<div class="alert alert-warning mb-0">Escribe un número de ranking.</div>';
+        resultado.innerHTML = '';
+        return;
+    }
+
+    if (window.rankingData.length === 0) {
+        estado.innerHTML = '<div class="alert alert-warning mb-0">El ranking aún no se ha cargado.</div>';
+        resultado.innerHTML = '';
+        return;
+    }
+
+    const rankingNumero = parseInt(rankingBuscado);
+
+    if (isNaN(rankingNumero)) {
+        estado.innerHTML = '<div class="alert alert-warning mb-0">Escribe un número válido.</div>';
+        resultado.innerHTML = '';
+        return;
+    }
+
+    const jugadorEncontrado = window.rankingData.find(jugador =>
+        parseInt(jugador.ranking) === rankingNumero
+    );
+
+    if (!jugadorEncontrado) {
+        estado.innerHTML = '<div class="alert alert-danger mb-0">No se encontró un jugador con ese ranking.</div>';
+        resultado.innerHTML = '';
+        return;
+    }
+
+    localStorage.setItem('rankingJugadorBuscado', rankingNumero);
+
+    estado.innerHTML = '';
+    renderizarJugadorBuscado(jugadorEncontrado);
+}
+
+function limpiarBusquedaJugador() {
+    const input = document.getElementById('inputJugadorRanking');
+    const estado = document.getElementById('estadoBusquedaJugador');
+    const resultado = document.getElementById('resultadoBusquedaJugador');
+
+    if (input) input.value = '';
+    if (estado) estado.innerHTML = '';
+    if (resultado) resultado.innerHTML = '';
+
+}
+
+function restaurarBusquedaRankingGuardada() {
+    const rankingGuardado = localStorage.getItem('rankingJugadorBuscado');
+
+    if (!rankingGuardado) return;
+    if (window.rankingData.length === 0) return;
+
+    const input = document.getElementById('inputJugadorRanking');
+    if (input) {
+        input.value = rankingGuardado;
+    }
+
+    const rankingNumero = parseInt(rankingGuardado);
+
+    const jugadorEncontrado = window.rankingData.find(jugador =>
+        parseInt(jugador.ranking) === rankingNumero
+    );
+
+    if (jugadorEncontrado) {
+        renderizarJugadorBuscado(jugadorEncontrado);
+    }
+}
+
 async function cargarRankingCompleto() {
     const estadoRanking = document.getElementById('estadoRanking');
 
@@ -381,29 +361,15 @@ async function cargarRankingCompleto() {
 
     window.paginaActualRanking = 1;
     renderizarRanking();
+    restaurarBusquedaRankingGuardada();
 }
 
-const btnBuscarJugador = document.getElementById('btnBuscarJugador');
-const btnLimpiarBusquedaJugador = document.getElementById('btnLimpiarBusquedaJugador');
-const inputJugadorId = document.getElementById('inputJugadorId');
 
-if (btnBuscarJugador) {
-    btnBuscarJugador.addEventListener('click', buscarJugadorPorId);
-}
-
-if (btnLimpiarBusquedaJugador) {
-    btnLimpiarBusquedaJugador.addEventListener('click', limpiarBusquedaJugador);
-}
-
-if (inputJugadorId) {
-    inputJugadorId.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            buscarJugadorPorId();
-        }
-    });
-}
 const btnSiguienteRanking = document.getElementById('btn-siguiente-ranking');
 const btnAnteriorRanking = document.getElementById('btn-anterior-ranking');
+const btnBuscarJugador = document.getElementById('btnBuscarJugador');
+const btnLimpiarBusquedaJugador = document.getElementById('btnLimpiarBusquedaJugador');
+const inputJugadorRanking = document.getElementById('inputJugadorRanking');
 
 if (btnSiguienteRanking) {
     btnSiguienteRanking.addEventListener('click', paginaSiguienteRanking);
@@ -412,5 +378,22 @@ if (btnSiguienteRanking) {
 if (btnAnteriorRanking) {
     btnAnteriorRanking.addEventListener('click', paginaAnteriorRanking);
 }
+
+if (btnBuscarJugador) {
+    btnBuscarJugador.addEventListener('click', buscarJugadorPorRanking);
+}
+
+if (btnLimpiarBusquedaJugador) {
+    btnLimpiarBusquedaJugador.addEventListener('click', limpiarBusquedaJugador);
+}
+
+if (inputJugadorRanking) {
+    inputJugadorRanking.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            buscarJugadorPorRanking();
+        }
+    });
+}
+
 
 cargarRankingCompleto();

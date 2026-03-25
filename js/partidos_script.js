@@ -1,10 +1,8 @@
 // *****************************************//
-//            TORNEOS/PARTIDOS              //
+//            PARTIDOS ATP                  //
 // *****************************************//
 
 window.partidosDataATP = [];
-window.partidosDataWTA = [];
-window.circuitoActual = 'atp';
 window.filtroActual = 'all';
 window.partidosVisibles = 10;
 window.incremento = 5;
@@ -21,7 +19,7 @@ async function obtenerPartidosATP() {
         }
         
         const datos = await respuesta.json();
-        return procesarDatosCircuitos(datos, 'ATP');
+        return procesarDatosATP(datos);
         
     } catch (error) {
         console.error('Error al obtener datos ATP:', error);
@@ -29,32 +27,13 @@ async function obtenerPartidosATP() {
     }
 }
 
-async function obtenerPartidosWTA() {
-    const url = 'https://site.api.espn.com/apis/site/v2/sports/tennis/wta/scoreboard';
-    
-    try {
-        const respuesta = await fetch(url);
-        
-        if (!respuesta.ok) {
-            throw new Error(`HTTP error! status: ${respuesta.status}`);
-        }
-        
-        const datos = await respuesta.json();
-        return procesarDatosCircuitos(datos, 'WTA');
-        
-    } catch (error) {
-        console.error('Error al obtener datos WTA:', error);
-        return [];
-    }
-}
-
-function procesarDatosCircuitos(datos, circuito) {
+function procesarDatosATP(datos) {
     if (!datos.events || datos.events.length === 0) {
         return [];
     }
     
     const torneoPrincipal = datos.events[0];
-    const nombreTorneo = torneoPrincipal.name || `${circuito} Tour`;
+    const nombreTorneo = torneoPrincipal.name || 'ATP Tour';
     let todosLosPartidos = [];
     
     if (torneoPrincipal.groupings) {
@@ -63,7 +42,7 @@ function procesarDatosCircuitos(datos, circuito) {
             const competencias = grouping.competitions || [];
             
             competencias.forEach(partido => {
-                const partidoProcesado = procesarPartido(partido, categoria, circuito, nombreTorneo);
+                const partidoProcesado = procesarPartido(partido, categoria, nombreTorneo);
                 if (partidoProcesado) {
                     todosLosPartidos.push(partidoProcesado);
                 }
@@ -76,7 +55,7 @@ function procesarDatosCircuitos(datos, circuito) {
     return todosLosPartidos;
 }
 
-function procesarPartido(partido, categoria, circuito, nombreTorneo) {
+function procesarPartido(partido, categoria, nombreTorneo) {
     const status = partido.status || {};
     const statusType = status.type || {};
     const isCompleted = statusType.completed;
@@ -148,7 +127,6 @@ function procesarPartido(partido, categoria, circuito, nombreTorneo) {
     
     return {
         id: partido.id,
-        circuito: circuito,
         torneo: nombreTorneo,
         categoria: categoria,
         round: round,
@@ -169,27 +147,15 @@ function procesarPartido(partido, categoria, circuito, nombreTorneo) {
     };
 }
 
-async function cargarTodosLosPartidos() {
-    const [partidosATP, partidosWTA] = await Promise.all([
-        obtenerPartidosATP(),
-        obtenerPartidosWTA()
-    ]);
-    
+async function cargarPartidosATP() {
+    const partidosATP = await obtenerPartidosATP();
     window.partidosDataATP = partidosATP;
-    window.partidosDataWTA = partidosWTA;
-    
     window.partidosVisibles = 10;
     actualizarVistaPartidos();
 }
 
 function actualizarVistaPartidos() {
-    let partidosCompletos = [];
-    
-    if (window.circuitoActual === 'atp') {
-        partidosCompletos = window.partidosDataATP;
-    } else {
-        partidosCompletos = window.partidosDataWTA;
-    }
+    let partidosCompletos = window.partidosDataATP;
     
     let partidosFiltrados = [];
     
@@ -199,20 +165,24 @@ function actualizarVistaPartidos() {
         partidosFiltrados = partidosCompletos.filter(partido => partido.estado === window.filtroActual);
     }
     
+    if (window.filtroActual === 'scheduled') {
+        partidosFiltrados.sort((a, b) => new Date(a.fechaRaw) - new Date(b.fechaRaw));
+    }
+    
     const tournamentInfo = document.getElementById('tournament-info');
     if (partidosCompletos.length > 0) {
         tournamentInfo.innerHTML = `
             <div class="d-flex align-items-center gap-2 mb-3">
                 <i class="bi bi-trophy-fill text-success fs-5"></i>
                 <span class="match-tournament fs-5 fw-semibold">${partidosCompletos[0].torneo}</span>
-                <span class="badge bg-secondary">${partidosCompletos[0].circuito} · 2026</span>
+                <span class="badge bg-secondary">ATP · 2026</span>
                 <span class="badge bg-info">${partidosFiltrados.length} partidos</span>
             </div>
         `;
     } else {
         tournamentInfo.innerHTML = `
             <div class="alert alert-info text-center py-2">
-                No hay partidos disponibles para este circuito.
+                No hay partidos disponibles en este momento.
             </div>
         `;
     }
@@ -232,18 +202,17 @@ function renderizarPartidosConPaginacion() {
     const loadMoreContainer = document.getElementById('load-more-container');
     const loadMoreBtn = document.getElementById('load-more-btn');
     
-    if (window.partidosVisibles < totalPartidos && window.partidosVisibles < window.maximoPartimos) {
-        const restantes = Math.min(window.incremento, totalPartidos - window.partidosVisibles, window.maximoPartidos - window.partidosVisibles);
-        loadMoreBtn.innerHTML = `<i class="bi bi-plus-circle me-2"></i>Mostrar más (${restantes})`;
-        loadMoreContainer.style.display = 'block';
-        
-        if (!loadMoreBtn.hasClickListener) {
+    if (loadMoreContainer && loadMoreBtn) {
+        if (window.partidosVisibles < totalPartidos && window.partidosVisibles < window.maximoPartidos) {
+            const restantes = Math.min(window.incremento, totalPartidos - window.partidosVisibles, window.maximoPartidos - window.partidosVisibles);
+            loadMoreBtn.innerHTML = `<i class="bi bi-plus-circle me-2"></i>Mostrar más (${restantes})`;
+            loadMoreContainer.style.display = 'block';
+            
             loadMoreBtn.removeEventListener('click', cargarMasPartidos);
             loadMoreBtn.addEventListener('click', cargarMasPartidos);
-            loadMoreBtn.hasClickListener = true;
+        } else {
+            loadMoreContainer.style.display = 'none';
         }
-    } else {
-        loadMoreContainer.style.display = 'none';
     }
 }
 
@@ -284,7 +253,7 @@ function renderizarPartidos(partidos) {
                     <div class="row align-items-center gy-3">
                         <div class="col-12 col-lg-3">
                             <div>
-                                <span class="match-tournament d-block">${partido.categoria || partido.circuito}</span>
+                                <span class="match-tournament d-block">${partido.categoria || 'ATP Tour'}</span>
                                 <small class="text-secondary">${partido.round}</small>
                             </div>
                         </div>
@@ -342,41 +311,10 @@ function filtrarPartidos(event) {
     actualizarVistaPartidos();
 }
 
-function cambiarCircuito(event) {
-    const circuito = event.currentTarget.getAttribute('data-circuit');
-    
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    event.currentTarget.classList.add('active');
-    
-    window.circuitoActual = circuito;
-    window.filtroActual = 'all';
-    window.partidosVisibles = 10;
-    
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('btn-success', 'active');
-        btn.classList.add('btn-outline-secondary');
-    });
-    
-    const primerFiltro = document.querySelector('.filter-btn[data-filter="all"]');
-    if (primerFiltro) {
-        primerFiltro.classList.remove('btn-outline-secondary');
-        primerFiltro.classList.add('btn-success', 'active');
-    }
-    
-    actualizarVistaPartidos();
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    cargarTodosLosPartidos();
+    cargarPartidosATP();
     
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', filtrarPartidos);
-    });
-    
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', cambiarCircuito);
     });
 });
