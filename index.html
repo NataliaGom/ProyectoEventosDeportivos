@@ -28,9 +28,9 @@
 				<div class="container py-2">
 					<a
 						class="navbar-brand d-flex align-items-center gap-2 fw-bold brand-title"
-						href="#inicio">
+						href="index.html">
 						<i class="bi bi-trophy fs-3"></i>
-						<span>NOMBRE "no definido todavía"</span>
+						<span>ATP Tour Central</span>
 					</a>
 
 					<div class="d-flex align-items-center gap-2 order-lg-2">
@@ -61,7 +61,7 @@
 							<li class="nav-item">
 								<a
 									class="nav-link active"
-									href="#inicio">
+									href="index.html">
 									<i class="bi bi-house-door me-1"></i>Inicio
 								</a>
 							</li>
@@ -111,7 +111,7 @@
 								<span class="badge rounded-pill recuadro-badge mb-3">
 									ATP · Temporada 2026
 								</span>
-								<h1 class="display-4 fw-bold mb-3">Bienvenido a "nombreeee"</h1>
+								<h1 class="display-4 fw-bold mb-3">Bienvenido a ATP Tour Central</h1>
 								<p class="lead mb-4 recuadro-text">
 									Sigue torneos, jugadores, partidos y estadísticas del circuito
 									profesional.
@@ -133,7 +133,7 @@
 					</div>
 
 					<!-- En vivo -->
-					<div class="live-banner mt-4 rounded-4 p-4 shadow-sm">
+					<div id="live-banner" class="live-banner mt-4 rounded-4 p-4 shadow-sm" style="display: none;">
 						<div
 							class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
 							<div>
@@ -141,24 +141,31 @@
 									<span class="live-dot"></span>
 									<h2 class="h4 mb-0 text-uppercase fw-bold">En vivo ahora</h2>
 								</div>
-								<p class="mb-1 fw-semibold">partdio api</p>
-								<p class="mb-0 live-subtext">jugadores - api</p>
+								<p id="live-partido" class="mb-1 fw-semibold">Cargando partido...</p>
+								<p id="live-detalle" class="mb-0 live-subtext">Cargando información...</p>
 							</div>
 
 							<div class="d-flex gap-3 flex-wrap">
 								<div class="mini-tarjeta">
-									<span class="mini-tarjeta-label">Jugadores</span>
-									<strong>api</strong>
+									<span class="mini-tarjeta-label">Torneo</span>
+									<strong id="live-torneo">---</strong>
 								</div>
 								<div class="mini-tarjeta">
-									<span class="mini-tarjeta-label">Torneos</span>
-									<strong>api</strong>
+									<span class="mini-tarjeta-label">Ronda</span>
+									<strong id="live-ronda">---</strong>
 								</div>
 								<div class="mini-tarjeta">
-									<span class="mini-tarjeta-label">Actualizado</span>
-									<strong>Hoy</strong>
+									<span class="mini-tarjeta-label">Marcador</span>
+									<strong id="live-marcador">---</strong>
 								</div>
 							</div>
+						</div>
+					</div>
+					
+					<div id="no-live-banner" class="live-banner mt-4 rounded-4 p-4 shadow-sm">
+						<div class="text-center">
+							<p class="mb-0 text-secondary">No hay partidos en vivo en este momento.</p>
+							<a href="partidos.html" class="btn btn-outline-success btn-sm mt-2">Ver próximos partidos</a>
 						</div>
 					</div>
 				</div>
@@ -197,50 +204,47 @@
 						</div>
 					</div>
 
-					
+					<!-- Grand Slams -->
+					<div class="col-12">
+						<div class="card border-0 shadow-sm rounded-4">
+							<div class="card-body p-4">
+								<h3 class="h5 mb-4">Títulos de Grand Slam · Era actual</h3>
 
-						<!-- Grand Slams -->
-						<div class="col-12">
-							<div class="card border-0 shadow-sm rounded-4">
-								<div class="card-body p-4">
-									<h3 class="h5 mb-4">Títulos de Grand Slam · Era actual</h3>
-
-									<div class="row g-3">
-										<div class="col-6 col-md-3 col-xl-2">
-											<div class="slam-box">
-												<span class="slam-label">Djokovic</span>
-												<strong>24</strong>
-											</div>
+								<div class="row g-3">
+									<div class="col-6 col-md-3 col-xl-2">
+										<div class="slam-box">
+											<span class="slam-label">Djokovic</span>
+											<strong>24</strong>
 										</div>
-										<div class="col-6 col-md-3 col-xl-2">
-											<div class="slam-box">
-												<span class="slam-label">Alcaraz</span>
-												<strong>4</strong>
-											</div>
+									</div>
+									<div class="col-6 col-md-3 col-xl-2">
+										<div class="slam-box">
+											<span class="slam-label">Alcaraz</span>
+											<strong>4</strong>
 										</div>
-										<div class="col-6 col-md-3 col-xl-2">
-											<div class="slam-box">
-												<span class="slam-label">Sinner</span>
-												<strong>2</strong>
-											</div>
+									</div>
+									<div class="col-6 col-md-3 col-xl-2">
+										<div class="slam-box">
+											<span class="slam-label">Sinner</span>
+											<strong>2</strong>
 										</div>
-										<div class="col-6 col-md-3 col-xl-2">
-											<div class="slam-box">
-												<span class="slam-label">Medvedev</span>
-												<strong>1</strong>
-											</div>
+									</div>
+									<div class="col-6 col-md-3 col-xl-2">
+										<div class="slam-box">
+											<span class="slam-label">Medvedev</span>
+											<strong>1</strong>
 										</div>
-										<div class="col-6 col-md-3 col-xl-2">
-											<div class="slam-box">
-												<span class="slam-label">Zverev</span>
-												<strong>0</strong>
-											</div>
+									</div>
+									<div class="col-6 col-md-3 col-xl-2">
+										<div class="slam-box">
+											<span class="slam-label">Zverev</span>
+											<strong>0</strong>
 										</div>
-										<div class="col-6 col-md-3 col-xl-2">
-											<div class="slam-box">
-												<span class="slam-label">Rublev</span>
-												<strong>0</strong>
-											</div>
+									</div>
+									<div class="col-6 col-md-3 col-xl-2">
+										<div class="slam-box">
+											<span class="slam-label">Rublev</span>
+											<strong>0</strong>
 										</div>
 									</div>
 								</div>
@@ -343,5 +347,6 @@
 
 		<script src="js/script.js"></script>
 		<script src="js/tema_script.js"></script>
+		<script src="js/index_script.js"></script>
 	</body>
 </html>
