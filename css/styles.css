@@ -492,3 +492,100 @@ body {
 #load-more-btn:hover i {
     transform: scale(1.1);
 }
+
+/* ========================================= */
+/*              SECCIÓN VIDEOS               */
+/* ========================================= */
+
+/* Quita subrayado del link */
+.video-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* CARD */
+.video-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    overflow: hidden;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover bonito */
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* IMAGEN */
+.video-image-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.video-image {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+/* zoom leve al hover */
+.video-card:hover .video-image {
+    transform: scale(1.05);
+}
+
+/* BOTÓN PLAY */
+.video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    width: 55px;
+    height: 55px;
+    
+    border-radius: 50%;
+    border: 2px solid white;
+    background: rgba(0, 0, 0, 0.25);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    color: white;
+    font-size: 1.4rem;
+    
+    transition: all 0.2s ease;
+}
+
+/* efecto hover del botón */
+.video-card:hover .video-play-btn {
+    background: rgba(0, 0, 0, 0.45);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* tetxp */
+.video-card-body {
+    padding: 1rem;
+}
+
+.video-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0;
+    color: #0b1b4d;
+}
+
+/* MODO OSCURO */
+[data-bs-theme="dark"] .video-card {
+    background-color: #1f1f1f;
+}
+
+[data-bs-theme="dark"] .video-card-title {
+    color: #f1f3f5;
+}
