@@ -8,6 +8,53 @@ window.partidosVisibles = 10;
 window.incremento = 5;
 window.maximoPartidos = 30;
 
+function formatearNombreJugador(nombreCompleto) {
+    if (!nombreCompleto) return 'Jugador';
+    
+    const partes = nombreCompleto.split(' ');
+    
+    if (partes.length >= 2) {
+        const inicial = partes[0].charAt(0);
+        const apellido = partes[partes.length - 1];
+        return `${inicial}. ${apellido}`;
+    }
+    
+    return nombreCompleto;
+}
+
+function extraerNombresEquipo(competitor) {
+    let nombres = [];
+    let paises = [];
+    
+    if (competitor.athletes && competitor.athletes.length > 0) {
+        competitor.athletes.forEach(ath => {
+            if (ath.athlete) {
+                nombres.push(ath.athlete.displayName);
+                if (ath.athlete.flag?.alt) paises.push(ath.athlete.flag.alt);
+            } else if (ath.displayName) {
+                nombres.push(ath.displayName);
+            }
+        });
+    } else if (competitor.athlete) {
+        nombres.push(competitor.athlete.displayName);
+        if (competitor.athlete.flag?.alt) paises.push(competitor.athlete.flag.alt);
+    } else if (competitor.displayName) {
+        nombres.push(competitor.displayName);
+    }
+    
+    if (nombres.length === 0) return null;
+    
+    const paisesUnicos = [...new Set(paises)];
+    
+    return {
+        jugadores: nombres,
+        nombresFormateados: nombres.map(n => formatearNombreJugador(n)),
+        nombreMostrar: nombres.map(n => formatearNombreJugador(n)).join(' / '),
+        pais: paisesUnicos.length === 1 ? paisesUnicos[0] : (paisesUnicos.length > 1 ? paisesUnicos.join(' / ') : ''),
+        esEquipo: nombres.length > 1
+    };
+}
+
 async function obtenerPartidosATP() {
     const url = 'https://site.api.espn.com/apis/site/v2/sports/tennis/atp/scoreboard';
     
@@ -76,20 +123,48 @@ function procesarPartido(partido, categoria, nombreTorneo) {
     }
     
     const competitors = partido.competitors || [];
-    let jugador1 = null;
-    let jugador2 = null;
+    
+    if (competitors.length < 2) return null;
+    
+    const equipo1 = [];
+    const equipo2 = [];
     
     competitors.forEach(competitor => {
-        if (competitor.order === 1) jugador1 = competitor;
-        if (competitor.order === 2) jugador2 = competitor;
+        if (competitor.order === 1) {
+            equipo1.push(competitor);
+        } else if (competitor.order === 2) {
+            equipo2.push(competitor);
+        }
     });
     
-    if (!jugador1 || !jugador2) return null;
+    if (equipo1.length === 0 || equipo2.length === 0) return null;
     
-    const nombreJugador1 = jugador1.athlete?.displayName || 'Jugador 1';
-    const nombreJugador2 = jugador2.athlete?.displayName || 'Jugador 2';
-    const paisJugador1 = jugador1.athlete?.flag?.alt || '';
-    const paisJugador2 = jugador2.athlete?.flag?.alt || '';
+    let infoEquipo1 = null;
+    let infoEquipo2 = null;
+    let esDobles = false;
+    
+    if (equipo1.length === 1 && equipo2.length === 1) {
+        const comp1 = equipo1[0];
+        const comp2 = equipo2[0];
+        
+        const tieneVariosAtletas1 = comp1.athletes && comp1.athletes.length > 1;
+        const tieneVariosAtletas2 = comp2.athletes && comp2.athletes.length > 1;
+        
+        if (tieneVariosAtletas1 || tieneVariosAtletas2) {
+            esDobles = true;
+            infoEquipo1 = extraerNombresEquipo(comp1);
+            infoEquipo2 = extraerNombresEquipo(comp2);
+        } else {
+            infoEquipo1 = extraerNombresEquipo(comp1);
+            infoEquipo2 = extraerNombresEquipo(comp2);
+        }
+    } else {
+        esDobles = true;
+        infoEquipo1 = extraerNombresEquipo(equipo1[0]);
+        infoEquipo2 = extraerNombresEquipo(equipo2[0]);
+    }
+    
+    if (!infoEquipo1 || !infoEquipo2) return null;
     
     const round = partido.round?.displayName || categoria || 'Ronda no especificada';
     const fechaRaw = partido.date || new Date().toISOString();
@@ -103,12 +178,15 @@ function procesarPartido(partido, categoria, nombreTorneo) {
     let marcador = '';
     let sets = [];
     
-    if (jugador1.linescores && jugador2.linescores) {
-        for (let i = 0; i < jugador1.linescores.length; i++) {
-            const score1 = jugador1.linescores[i]?.value || 0;
-            const score2 = jugador2.linescores[i]?.value || 0;
-            const tiebreak1 = jugador1.linescores[i]?.tiebreak;
-            const tiebreak2 = jugador2.linescores[i]?.tiebreak;
+    const jugadorReferencia1 = equipo1[0];
+    const jugadorReferencia2 = equipo2[0];
+    
+    if (jugadorReferencia1.linescores && jugadorReferencia2.linescores) {
+        for (let i = 0; i < jugadorReferencia1.linescores.length; i++) {
+            const score1 = jugadorReferencia1.linescores[i]?.value || 0;
+            const score2 = jugadorReferencia2.linescores[i]?.value || 0;
+            const tiebreak1 = jugadorReferencia1.linescores[i]?.tiebreak;
+            const tiebreak2 = jugadorReferencia2.linescores[i]?.tiebreak;
             
             let setText = `${score1}-${score2}`;
             if (tiebreak1 || tiebreak2) {
@@ -122,18 +200,22 @@ function procesarPartido(partido, categoria, nombreTorneo) {
         }
     }
     
-    const winner = jugador1.winner ? jugador1 : (jugador2.winner ? jugador2 : null);
-    const ganadorNombre = winner?.athlete?.displayName || '';
+    let ganadorNombre = '';
+    const winner = competitors.find(comp => comp.winner === true);
+    if (winner && winner.order === 1) {
+        ganadorNombre = infoEquipo1.nombreMostrar;
+    } else if (winner && winner.order === 2) {
+        ganadorNombre = infoEquipo2.nombreMostrar;
+    }
     
     return {
         id: partido.id,
         torneo: nombreTorneo,
         categoria: categoria,
         round: round,
-        jugador1: nombreJugador1,
-        jugador2: nombreJugador2,
-        pais1: paisJugador1,
-        pais2: paisJugador2,
+        equipo1: infoEquipo1,
+        equipo2: infoEquipo2,
+        esDobles: esDobles,
         marcador: marcador,
         sets: sets,
         fecha: fecha,
@@ -247,6 +329,12 @@ function renderizarPartidos(partidos) {
     let html = '';
     
     partidos.forEach(partido => {
+        const nombreEquipo1 = partido.equipo1.nombreMostrar;
+        const nombreEquipo2 = partido.equipo2.nombreMostrar;
+        const paisEquipo1 = partido.equipo1.pais;
+        const paisEquipo2 = partido.equipo2.pais;
+        const esDobles = partido.esDobles;
+        
         html += `
             <article class="match-card card border-0 shadow-sm rounded-4 mb-3" data-estado="${partido.estado}">
                 <div class="card-body">
@@ -254,19 +342,19 @@ function renderizarPartidos(partidos) {
                         <div class="col-12 col-lg-3">
                             <div>
                                 <span class="match-tournament d-block">${partido.categoria || 'ATP Tour'}</span>
-                                <small class="text-secondary">${partido.round}</small>
+                                <small class="text-secondary">${partido.round}${esDobles ? ' · Dobles' : ''}</small>
                             </div>
                         </div>
                         <div class="col-12 col-lg-5">
                             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-center gap-2 gap-md-3">
-                                <div class="fw-semibold text-center text-md-end" style="min-width: 120px;">
-                                    ${partido.pais1 ? `<span class="small text-secondary">[${partido.pais1}]</span> ` : ''}${partido.jugador1}
-                                    ${partido.ganador === partido.jugador1 ? '<i class="bi bi-trophy-fill text-warning ms-1 small"></i>' : ''}
+                                <div class="fw-semibold text-center text-md-end" style="min-width: 160px;">
+                                    ${paisEquipo1 ? `<span class="small text-secondary">[${paisEquipo1}]</span> ` : ''}${nombreEquipo1}
+                                    ${partido.ganador === nombreEquipo1 ? '<i class="bi bi-trophy-fill text-warning ms-1 small"></i>' : ''}
                                 </div>
                                 <span class="vs-badge">vs</span>
-                                <div class="fw-semibold text-center text-md-start" style="min-width: 120px;">
-                                    ${partido.pais2 ? `<span class="small text-secondary">[${partido.pais2}]</span> ` : ''}${partido.jugador2}
-                                    ${partido.ganador === partido.jugador2 ? '<i class="bi bi-trophy-fill text-warning ms-1 small"></i>' : ''}
+                                <div class="fw-semibold text-center text-md-start" style="min-width: 160px;">
+                                    ${paisEquipo2 ? `<span class="small text-secondary">[${paisEquipo2}]</span> ` : ''}${nombreEquipo2}
+                                    ${partido.ganador === nombreEquipo2 ? '<i class="bi bi-trophy-fill text-warning ms-1 small"></i>' : ''}
                                 </div>
                             </div>
                             ${partido.marcador ? `<div class="text-center mt-2 small text-secondary">${partido.marcador}</div>` : ''}
