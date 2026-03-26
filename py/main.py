@@ -17,7 +17,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+@app.get("/health")
+async def health_check():
+    return {
+        "status": "ok",
+        "jugadores_cargados": len(jugadores_mem)
+    }
 
 # Almacenamiento 
 jugadores_mem: list[JugadorRespuestaDTO] = []
@@ -37,7 +42,7 @@ async def guardar_ranking(jugadores: list[JugadorDTO]):
     return jugadores_mem
 
 
-@app.get("/jugadores/ranking/{puesto_rank}", response_model=JugadorRespuestaDTO)
+@app.get("/jugadores/ranking/{rank}", response_model=JugadorRespuestaDTO)
 async def obtener_jugador(rank: str):
     """
     Busca un jugador por:
