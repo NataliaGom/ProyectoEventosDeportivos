@@ -339,6 +339,22 @@ function restaurarBusquedaRankingGuardada() {
     }
 }
 
+//Funcion para el post
+async function enviarRankingAlBackend(jugadores) {
+    try {
+        const respuesta = await fetch('https://sports.core.api.espn.com/v2/sports/tennis/leagues/atp/seasons/2026/types/2/weeks/11/rankings/1?lang=en&region=us', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(jugadores)
+        });
+
+        if (!respuesta.ok) throw new Error(`Error: ${respuesta.status}`);
+        console.log('Ranking enviado al backend correctamente');
+    } catch (error) {
+        console.error('Error al enviar ranking:', error);
+    }
+}
+
 async function cargarRankingCompleto() {
     const estadoRanking = document.getElementById('estadoRanking');
 
@@ -361,8 +377,11 @@ async function cargarRankingCompleto() {
 
     window.paginaActualRanking = 1;
     renderizarRanking();
+    await enviarRankingAlBackend(window.rankingData);
     restaurarBusquedaRankingGuardada();
 }
+
+
 
 
 const btnSiguienteRanking = document.getElementById('btn-siguiente-ranking');
