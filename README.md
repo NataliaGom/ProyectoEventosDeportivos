@@ -1,26 +1,73 @@
-# ProyectoEventosDeportivos
+# TopTenisStats 
 
-Estado actual del proyecto:
-Por ahora, el proyecto todavía no es la versión final.
+Plataforma web para el seguimiento del tenis profesional masculino (ATP). Consulta rankings en tiempo real, resultados de partidos, estadísticas y perfiles de jugadores del circuito ATP.
 
-Se ha avanzado en:
+---
 
--Hacer la página responsiva usando Bootstrap
+##  Página web
 
--Implementar modo claro y oscuro
+**[toptenistats.com](https://toptenistats.com)**
 
--Uso de localStorage en el formulario de comentarios
+---
 
-Aún falta:
+##  Levantar el frontend
 
-Llenar algunos campos con datos de una API externa
+El frontend es estático — no requiere instalación ni servidor adicional.
 
-Agregar estadísticas o gráficas en la sección correspondiente
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/NataliaGom/ProyectoEventosDeportivos.git
+   cd ProyectoEventosDeportivos
+   ```
 
-Tener un dominio
+2. Abre `index.html` directamente en tu navegador, o usa una extensión como **Live Server** en VS Code.
 
-Mejorar varios aspectos
+> Todos los datos se obtienen en tiempo real desde la ESPN API pública — no se requiere configuración adicional.
 
-## ENCONTRAR EL player_key correcto de Sinner y de Alcaraz para las mini-tarjetas.
+---
 
-## api_key fcd8e4e3602130a6a1df894b6c5549eb9ae9a5859896677164ba5fea76b271c5. Link de documentacion: https://api-tennis.com/documentation
+##  Levantar el backend
+
+### Requisitos previos
+- Python 3.10+
+
+### Instalación
+
+1. Instala las dependencias:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. Levanta el servidor:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+El servidor queda disponible en `http://localhost:8000`.
+
+---
+
+##  Health endpoint
+
+```
+GET http://localhost:8000/health
+```
+
+Verifica que la API esté funcionando y muestra cuántos jugadores están cargados en memoria.
+
+La documentación interactiva completa de la API está disponible en:
+```
+http://localhost:8000/docs
+```
+
+---
+
+## 👥 Autores
+
+| | Nombre |
+|---|---|
+| <img src="https://raw.githubusercontent.com/NataliaGom/ProyectoEventosDeportivos/main/img/nat.png"
+width="50" style="border-radius:50%"/> | **Natalia Gómez Álvarez** |
+| <img src="https://raw.githubusercontent.com/NataliaGom/ProyectoEventosDeportivos/main/img/andre.png" width="50" style="border-radius:50%"/> | **André Herrera Cataño** |
+| <img src="https://raw.githubusercontent.com/NataliaGom/ProyectoEventosDeportivos/main/img/sergio.png" width="50" style="border-radius:50%"/> | **Sergio García Ávila** |
+
