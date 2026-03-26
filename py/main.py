@@ -19,6 +19,9 @@ app.add_middleware(
 # Almacenamiento 
 jugadores_mem: list[JugadorRespuestaDTO] = []
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 @app.post("/jugadores/ranking", response_model=list[JugadorRespuestaDTO])
 async def guardar_ranking(jugadores: list[JugadorDTO]):
