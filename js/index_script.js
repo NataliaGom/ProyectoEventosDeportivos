@@ -2,10 +2,9 @@
 //        PARTIDO EN VIVO - INDEX           //
 // *****************************************//
 
-function formatearNombreJugadorIndex(athlete) {
-    if (!athlete || !athlete.displayName) return 'Jugador';
+function formatearNombreJugadorIndex(nombreCompleto) {
+    if (!nombreCompleto) return 'Jugador';
     
-    const nombreCompleto = athlete.displayName;
     const partes = nombreCompleto.split(' ');
     
     if (partes.length >= 2) {
@@ -17,27 +16,33 @@ function formatearNombreJugadorIndex(athlete) {
     return nombreCompleto;
 }
 
-function procesarEquipoIndex(competitors) {
-    if (!competitors || competitors.length === 0) return null;
+function extraerJugadorIndex(competitor) {
+    let nombre = '';
+    let pais = '';
     
-    if (competitors.length === 1) {
-        const jugador = competitors[0];
-        return {
-            nombre: formatearNombreJugadorIndex(jugador.athlete),
-            pais: jugador.athlete?.flag?.alt || '',
-            esEquipo: false
-        };
+    if (competitor.athlete) {
+        nombre = competitor.athlete.displayName;
+        if (competitor.athlete.flag?.alt) pais = competitor.athlete.flag.alt;
+    } else if (competitor.displayName) {
+        nombre = competitor.displayName;
     }
     
-    const nombres = competitors.map(comp => formatearNombreJugadorIndex(comp.athlete));
-    const paises = competitors.map(comp => comp.athlete?.flag?.alt || '');
-    const paisesUnicos = [...new Set(paises.filter(p => p !== ''))];
+    if (!nombre) return null;
     
     return {
-        nombre: nombres.join(' / '),
-        pais: paisesUnicos.length === 1 ? paisesUnicos[0] : paises.join(' / '),
-        esEquipo: true
+        nombre: nombre,
+        nombreFormateado: formatearNombreJugadorIndex(nombre),
+        pais: pais
     };
+}
+
+function esPartidoIndividualIndex(competitors) {
+    if (competitors.length !== 2) return false;
+    
+    const tieneVariosAtletas1 = competitors[0].athletes && competitors[0].athletes.length > 1;
+    const tieneVariosAtletas2 = competitors[1].athletes && competitors[1].athletes.length > 1;
+    
+    return !tieneVariosAtletas1 && !tieneVariosAtletas2;
 }
 
 async function obtenerPartidosATPIndex() {
@@ -86,41 +91,38 @@ function procesarDatosATPIndex(datos) {
 }
 
 function procesarPartidoIndex(partido, categoria, nombreTorneo) {
+    const competitors = partido.competitors || [];
+    
+    if (!esPartidoIndividualIndex(competitors)) return null;
+    
     const status = partido.status || {};
     const statusType = status.type || {};
     const isLive = statusType.state === 'in' || statusType.state === 'live';
     
     if (!isLive) return null;
     
-    const competitors = partido.competitors || [];
-    
-    if (competitors.length < 2) return null;
-    
-    const equipo1 = [];
-    const equipo2 = [];
+    let jugador1 = null;
+    let jugador2 = null;
     
     competitors.forEach(competitor => {
         if (competitor.order === 1) {
-            equipo1.push(competitor);
+            jugador1 = extraerJugadorIndex(competitor);
         } else if (competitor.order === 2) {
-            equipo2.push(competitor);
+            jugador2 = extraerJugadorIndex(competitor);
         }
     });
     
-    if (equipo1.length === 0 || equipo2.length === 0) return null;
-    
-    const infoEquipo1 = procesarEquipoIndex(equipo1);
-    const infoEquipo2 = procesarEquipoIndex(equipo2);
+    if (!jugador1 || !jugador2) return null;
     
     const round = partido.round?.displayName || categoria || 'Ronda no especificada';
     
     let marcador = '';
     let sets = [];
     
-    const jugadorReferencia1 = equipo1[0];
-    const jugadorReferencia2 = equipo2[0];
+    const jugadorReferencia1 = competitors.find(c => c.order === 1);
+    const jugadorReferencia2 = competitors.find(c => c.order === 2);
     
-    if (jugadorReferencia1.linescores && jugadorReferencia2.linescores) {
+    if (jugadorReferencia1?.linescores && jugadorReferencia2?.linescores) {
         for (let i = 0; i < jugadorReferencia1.linescores.length; i++) {
             const score1 = jugadorReferencia1.linescores[i]?.value || 0;
             const score2 = jugadorReferencia2.linescores[i]?.value || 0;
@@ -139,15 +141,12 @@ function procesarPartidoIndex(partido, categoria, nombreTorneo) {
         }
     }
     
-    const esDobles = (equipo1.length > 1 || equipo2.length > 1);
-    
     return {
         torneo: nombreTorneo,
         categoria: categoria,
         round: round,
-        equipo1: infoEquipo1,
-        equipo2: infoEquipo2,
-        esDobles: esDobles,
+        jugador1: jugador1,
+        jugador2: jugador2,
         marcador: marcador,
         sets: sets
     };
@@ -163,13 +162,13 @@ async function actualizarPartidoEnVivo() {
     if (partidosEnVivo.length > 0) {
         const partido = partidosEnVivo[0];
         
-        const nombreEquipo1 = partido.equipo1.nombre;
-        const nombreEquipo2 = partido.equipo2.nombre;
-        const paisEquipo1 = partido.equipo1.pais;
-        const paisEquipo2 = partido.equipo2.pais;
+        const nombreJugador1 = partido.jugador1.nombreFormateado;
+        const nombreJugador2 = partido.jugador2.nombreFormateado;
+        const paisJugador1 = partido.jugador1.pais;
+        const paisJugador2 = partido.jugador2.pais;
         
-        document.getElementById('live-partido').innerHTML = `${paisEquipo1 ? `[${paisEquipo1}] ` : ''}${nombreEquipo1} <span class="text-danger">vs</span> ${paisEquipo2 ? `[${paisEquipo2}] ` : ''}${nombreEquipo2}`;
-        document.getElementById('live-detalle').innerHTML = `${partido.categoria || 'ATP Tour'} · ${partido.round}${partido.esDobles ? ' · Dobles' : ''}`;
+        document.getElementById('live-partido').innerHTML = `${paisJugador1 ? `[${paisJugador1}] ` : ''}${nombreJugador1} <span class="text-danger">vs</span> ${paisJugador2 ? `[${paisJugador2}] ` : ''}${nombreJugador2}`;
+        document.getElementById('live-detalle').innerHTML = `${partido.categoria || 'ATP Tour'} · ${partido.round}`;
         document.getElementById('live-torneo').innerHTML = partido.torneo.length > 20 ? partido.torneo.substring(0, 20) + '...' : partido.torneo;
         document.getElementById('live-ronda').innerHTML = partido.round;
         document.getElementById('live-marcador').innerHTML = partido.marcador || (partido.sets.length > 0 ? partido.sets[partido.sets.length - 1] : 'En juego');
