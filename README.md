@@ -66,8 +66,7 @@ http://localhost:8000/docs
 
 | | Nombre |
 |---|---|
-| <img src="https://raw.githubusercontent.com/NataliaGom/ProyectoEventosDeportivos/main/img/FotoNat.jpeg"
-width="50" style="border-radius:50%"/> | **Natalia Gómez Álvarez** |
+| <img src="https://raw.githubusercontent.com/NataliaGom/ProyectoEventosDeportivos/main/img/FotoNat.jpeg"width="50" style="border-radius:50%"/> | **Natalia Gómez Álvarez** |
 | <img src="https://raw.githubusercontent.com/NataliaGom/ProyectoEventosDeportivos/main/img/andreEnUtah.jpg" width="50" style="border-radius:50%"/> | **Andre Herrera Cataño** |
 | <img src="https://raw.githubusercontent.com/NataliaGom/ProyectoEventosDeportivos/main/img/sergio.png" width="50" style="border-radius:50%"/> | **Sergio García Ávila** |
 
